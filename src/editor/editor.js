@@ -1,8 +1,6 @@
 'use strict'
 import rangy from 'rangy'
 
-console.log(rangy);
-
 function extend(dest, src) {
   Object.keys(src).forEach((k) => {
     dest[k] = src[k];
@@ -61,6 +59,21 @@ export class Editor {
           html: '<button class="btn btn-default"><s>A</s></button>',
           action: (e) => this.onButtonAction(e, 'strikethrough', false, null)
         },
+        {
+          key: 'justifyLeft',
+          html: '<button class="btn btn-default">LEFT</button>',
+          action: (e) => this.onButtonAction(e, 'justifyLeft', false, null)
+        },
+        {
+          key: 'justifyCenter',
+          html: '<button class="btn btn-default">CENTER</button>',
+          action: (e) => this.onButtonAction(e, 'justifyCenter', false, null)
+        },
+        {
+          key: 'justifyRight',
+          html: '<button class="btn btn-default">RIGHT</button>',
+          action: (e) => this.onButtonAction(e, 'justifyRight', false, null)
+        },
         //FIXME: DUMMY
         {
           key: 'anchor',
@@ -71,19 +84,52 @@ export class Editor {
         {
           key: 'orderedlist',
           html: '<button class="btn btn-default">OL</button>',
-          action: (e) => this.onButtonAction(e, 'orderedlist', false, null)
+          action: (e) => this.onButtonAction(e, 'insertOrderedList', false, null)
         },
         //FIXME: DUMMY
         {
           key: 'unorderedlist',
           html: '<button class="btn btn-default">UL</button>',
-          action: (e) => this.onButtonAction(e, 'unorderedlist', false, null)
+          action: (e) => this.onButtonAction(e, 'insertUnorderedList', false, null)
+        },
+        {
+          key: 'removeFormat',
+          html: '<button class="btn btn-default">Clear Format</button>',
+          action: (e) => this.onButtonAction(e, 'removeFormat', false, null)
+        },
+        {
+          key: 'RESET',
+          html: '<button class="btn btn-default">RESET</button>',
+          action: (e) => this.onReset(e)
+        },
+        {
+          key: 'SAVE',
+          html: '<button class="btn btn-default">SAVE</button>',
+          action: (e) => this.onSave(e)
         }
       ]
     };
 
     // Extend default.
     this.options = extend(baseOptions, options);
+  }
+
+  createFloatingTbar() {
+    if (this.floatingTbar) { return; }
+
+    this.floatingTbar = document.createElement('div');
+    this.floatingTbar.setAttribute('style',
+      `
+        position: absolute;
+        display: block;
+        top: 100px;
+        left: 100px;
+        background: red;
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+      `);
+    this.editor.parentNode.insertBefore(this.floatingTbar, this.editor);
   }
 
   createToolbar() {
@@ -113,6 +159,7 @@ export class Editor {
     }
     this.createContentEditable();
     this.createToolbar();
+    this.createFloatingTbar();
     this.reset();
     this.initEvent();
   }
@@ -136,11 +183,16 @@ export class Editor {
     this.editor.addEventListener('mousedown', (e) => this.onMouseDown(e));
 
   }
-
+  save() {
+    this.updateValue();
+    this.dispatchEvent('editor.save');
+    return this.value;
+  }
   reset() {
     this.editor.innerHTML =this.options.placeholder;
     this.value = '';
     this.empty = true;
+    this.dispatchEvent('editor.change')
   }
 
   dispatchEvent(eventName, ...args) {
@@ -162,30 +214,41 @@ export class Editor {
 
   exec(cmd, ...options) {
     document.execCommand(cmd, ...options);
-    console.log(cmd, ...options);
+    console.debug(cmd, ...options);
     this.updateValue();
   }
 
   onButtonAction(e, ...args) {
-    console.log('buttonAction', args);
     e.preventDefault();
     e.stopPropagation();
     this.exec(...args);
   }
 
+  onSave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.save();
+  }
+
+  onReset(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.reset();
+  }
+
   onFocus(e) {
-    console.log('focus', e);
+    console.debug('focus', e);
     if (this.empty) {
       this.editor.innerHTML = '<p><br/></p>';
     }
   }
 
   onChange(e) {
-    console.log('change', e);
+    console.debug('change', e);
   }
 
   onBlur(e) {
-    console.log('blur', e);
+    console.debug('blur', e);
     let value = this.editor.innerHTML;
 
     if (this.stripTag(value) === '') {
@@ -196,18 +259,50 @@ export class Editor {
     console.log(this.value);
   }
 
+  setMousePosition(x, y, height = null) {
+    // TODO: 複数行選択のときイケてない
+    let sel = document.selection;
+    let h = 0;
+    let w = 0;
+
+    if (sel) {
+      if (sel.type !== 'Control') {
+        let range = sel.createRange();
+        w = range.boundingWidth;
+        h = range.boundingHeight;
+      }
+    } else if (window.getSelection) {
+      //non IE
+      sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        let range = sel.getRangeAt(0).cloneRange();
+        if (range.getBoundingClientRect) {
+          let rect = range.getBoundingClientRect();
+          w = rect.right - rect.left;
+          h = rect.bottom = rect.top;
+          x = rect.left;
+          y = rect.top;
+        }
+      }
+    }
+    this.floatingTbar.style.left = `${x + w / 2}px`;
+    this.floatingTbar.style.top = `${y - 20}px`;
+  }
+
   onMouseUp(e) {
     this.getSelection();
+    this.setMousePosition(e.pageX, e.pageY, e.target.clientHeight);
   }
 
   onMouseDown(e) {
     this.getSelection();
+    console.log(e);
+    this.setMousePosition(e.pageX, e.pageY, e.target.clientHeight);
   }
 
   getSelection() {
     let selection = window.getSelection();
     let rangySelection = rangy.getSelection();
-    console.log('Selection', selection, rangySelection);
   }
 
   stripTag(str = '') {

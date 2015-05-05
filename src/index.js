@@ -16,6 +16,10 @@ class DebugCtrl {
     this.editor.editor.addEventListener('editor.change', (e) => {
       this.textArea.innerHTML = this.editor.value;
     });
+
+    this.editor.editor.addEventListener('editor.save', (e) => {
+      alert(this.editor.value);
+    });
   }
 
   createTextArea() {

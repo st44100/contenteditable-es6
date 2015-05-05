@@ -8,6 +8,25 @@ $ npm install
 $ jspm install
 $ gulp watch
 ```
+USAGE
+---
+
+### HTML:
+
+```index.html
+<div id="editor" contentEditable="true"></div>
+```
+
+### JavaScript:
+
+```index.js
+import {Editor} from './editor/editor'
+
+let MyEditor = new Editor('editor');
+MyEditor.createRichEditor();
+```
+
+RichEditor will render to `div#editor`.
 
 log
 ---

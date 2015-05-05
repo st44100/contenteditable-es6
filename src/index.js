@@ -3,6 +3,10 @@ import {Editor} from './editor/editor'
 let MyEditor = new Editor('editor');
 MyEditor.createRichEditor();
 
+
+/**
+ * Dummy controller for debug.
+ */
 class DebugCtrl {
   constructor(target, editor) {
     this.editor = editor;

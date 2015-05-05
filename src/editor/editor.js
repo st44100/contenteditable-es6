@@ -61,16 +61,19 @@ export class Editor {
           html: '<button class="btn btn-default"><s>A</s></button>',
           action: (e) => this.onButtonAction(e, 'strikethrough', false, null)
         },
+        //FIXME: DUMMY
         {
           key: 'anchor',
           html: '<button class="btn btn-default">LINK</button>',
           action: (e) => this.onButtonAction(e, 'anchor', false, null)
         },
+        //FIXME: DUMMY
         {
           key: 'orderedlist',
           html: '<button class="btn btn-default">OL</button>',
           action: (e) => this.onButtonAction(e, 'orderedlist', false, null)
         },
+        //FIXME: DUMMY
         {
           key: 'unorderedlist',
           html: '<button class="btn btn-default">UL</button>',
@@ -126,13 +129,11 @@ export class Editor {
       throw new Error("Missing editor");
     }
 
-
     this.editor.addEventListener('focus', (e) => this.onFocus(e));
     this.editor.addEventListener('change', (e) => this.onChange(e));
     this.editor.addEventListener('blur', (e) => this.onBlur(e));
     this.editor.addEventListener('mouseup', (e) => this.onMouseUp(e));
     this.editor.addEventListener('mousedown', (e) => this.onMouseDown(e));
-
 
   }
 

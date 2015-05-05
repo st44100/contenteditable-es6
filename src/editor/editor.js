@@ -15,6 +15,7 @@ export class Editor {
     this.editor = null;
     this.empty = true;
     this.value = '';
+    this.focus = false;
     this.inputChangeTimer = null;
     this.options = {};
     let baseOptions = {
@@ -141,11 +142,11 @@ export class Editor {
   }
 
   hideTbar(delay = 100) {
-    setTimeout( => this.floatingTbar.style.opacity = 0, delay);
+    setTimeout( () => this.floatingTbar.style.opacity = 0, delay);
   }
 
   showTbar(delay = 100) {
-    setTimeout( => this.floatingTbar.style.opacity = 1, delay);
+    setTimeout( () => this.floatingTbar.style.opacity = 1, delay);
   }
 
   createToolbar() {
@@ -197,8 +198,10 @@ export class Editor {
     this.editor.addEventListener('blur', (e) => this.onBlur(e));
     this.editor.addEventListener('mouseup', (e) => this.onMouseUp(e));
     this.editor.addEventListener('mousedown', (e) => this.onMouseDown(e));
-
+    document.addEventListener('keyup', (e) => this.onKeyup(e));
+    document.addEventListener('keydown', (e) => this.onKeydown(e));
   }
+
   save() {
     this.updateValue();
     this.dispatchEvent('editor.save');
@@ -256,6 +259,7 @@ export class Editor {
     if (this.empty) {
       this.editor.innerHTML = '<p><br/></p>';
     }
+    this.focus = true;
   }
 
   onChange(e) {
@@ -275,9 +279,42 @@ export class Editor {
     }
 
     this.hideTbar();
+    this.focus = false;
   }
 
-  setMousePosition(x, y, height = null) {
+  onMouseUp(e) {
+    this.getSelection();
+    this.setMousePosition(e.pageX, e.pageY, e.target.clientHeight);
+  }
+
+  onMouseDown(e) {
+    this.getSelection();
+    this.setMousePosition(e.pageX, e.pageY, e.target.clientHeight);
+  }
+
+  onKeyup(e) {
+    if (!this.focus) { return; }
+    //do Something when Shift + Enter.
+  }
+
+  onKeydown(e) {
+    if (!this.focus || !e.type === 'keydown') { return; }
+    if (!e.metaKey) { return; }
+
+    switch(+e.which) {
+      case 65: // Cmd + A
+        console.debug('Cmd + A');
+        window.getSelection().selectAllChildren(this.editor); // Select all child nodes.
+        this.getSelection();
+        this.setMousePosition();
+        break;
+
+      default:
+        return;
+    }
+  }
+
+  setMousePosition(x = 0, y = 0, height = null) {
     // TODO: 複数行選択のときイケてない
     let sel = document.selection;
     let h = 0;
@@ -318,19 +355,10 @@ export class Editor {
     } else {
       this.floatingTbar.style.left = `${targetX}px`;
       this.floatingTbar.style.top = `${targetY}px`;
-      this.shotTabr();
+      this.showTbar();
     }
   }
 
-  onMouseUp(e) {
-    this.getSelection();
-    this.setMousePosition(e.pageX, e.pageY, e.target.clientHeight);
-  }
-
-  onMouseDown(e) {
-    this.getSelection();
-    this.setMousePosition(e.pageX, e.pageY, e.target.clientHeight);
-  }
 
   getSelection() {
     let selection = window.getSelection();

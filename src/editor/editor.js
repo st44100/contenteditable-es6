@@ -122,13 +122,14 @@ export class Editor {
       `
         position: absolute;
         display: block;
+        opacity: 0;
         top: 100px;
         left: 100px;
-        background: red;
-        height: 10px;
-        width: 10px;
-        border-radius: 50%;
       `);
+    for (var option of this.options.buttons) {
+      let button = this.createToolbarButton(option);
+      this.floatingTbar.appendChild(button);
+    }
     this.editor.parentNode.insertBefore(this.floatingTbar, this.editor);
   }
 
@@ -285,8 +286,14 @@ export class Editor {
         }
       }
     }
-    this.floatingTbar.style.left = `${x + w / 2}px`;
-    this.floatingTbar.style.top = `${y - 20}px`;
+    let targetX = x + w / 2 - this.floatingTbar.clientWidth / 2;
+    let editorRect = this.editor.getBoundingClientRect();
+    if (targetX < editorRect.left) {
+      targetX = editorRect.left;
+    }
+    this.floatingTbar.style.left = `${targetX}px`;
+    this.floatingTbar.style.top = `${y - this.floatingTbar.clientHeight - 20}px`;
+    this.floatingTbar.style.opacity = 1;
   }
 
   onMouseUp(e) {

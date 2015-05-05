@@ -7,3 +7,7 @@ body {
 	height: 24px;
 	width: 24px;
 }
+
+.tbar__btn {
+  display: inline-block;
+}

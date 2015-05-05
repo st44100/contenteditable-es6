@@ -15,8 +15,13 @@ common-transition(prop=all,duration = common-duration, tf = common-tf , delay = 
   transition prop duration tf delay
 
 body
-  padding-top 50px
   padding-bottom 20px
+
+[contentEditable]
+  min-height 200px
+
+  &:focus
+    outline none
 
 .navbar-brand img
 	height 24px

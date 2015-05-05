@@ -20,6 +20,11 @@ export class Editor {
       placeholder: 'Type Something...',
       buttons:[
         {
+         key: 'p',
+          html: '<button class="btn btn-default">P</button>',
+          action: (e) => this.onButtonAction(e, 'formatBlock', false, '<p>')
+        },
+        {
          key: 'h2',
           html: '<button class="btn btn-default">H2</button>',
           action: (e) => this.onButtonAction(e, 'formatBlock', false, '<h2>')

@@ -140,6 +140,14 @@ export class Editor {
     this.editor.parentNode.insertBefore(this.floatingTbar, this.editor);
   }
 
+  hideTbar(delay = 100) {
+    setTimeout( => this.floatingTbar.style.opacity = 0, delay);
+  }
+
+  showTbar(delay = 100) {
+    setTimeout( => this.floatingTbar.style.opacity = 1, delay);
+  }
+
   createToolbar() {
     if (this.tbar) { return; }
     this.tbar = document.createElement('div');
@@ -265,6 +273,8 @@ export class Editor {
     } else {
       this.setValue(value);
     }
+
+    this.hideTbar();
   }
 
   setMousePosition(x, y, height = null) {
@@ -293,9 +303,10 @@ export class Editor {
         }
       }
     } else {
-      this.floatingTbar.style.opacity = 0;
+      this.hideTbar();
       return;
     }
+
     let targetX = x + w / 2 - this.floatingTbar.clientWidth / 2;
     let targetY = y - this.floatingTbar.clientHeight - 20;
     let editorRect = this.editor.getBoundingClientRect();
@@ -303,11 +314,11 @@ export class Editor {
       targetX = editorRect.left;
     }
     if (targetY < 1) {
-      setTimeout( () => this.floatingTbar.style.opacity = 0, 100);
+      this.hideTbar();
     } else {
       this.floatingTbar.style.left = `${targetX}px`;
       this.floatingTbar.style.top = `${targetY}px`;
-      setTimeout( () => this.floatingTbar.style.opacity = 1, 100);
+      this.shotTabr();
     }
   }
 

@@ -33,5 +33,5 @@ log
 
 - guardian/scribe is not compatible with systemjs.
 - Give up to use guardian/scribe.
-- Add a floating toolbar like medium editor(![daviferreira/medium-editor](https://github.com/daviferreira/medium-editor)).
+- Add a floating toolbar like medium editor([daviferreira/medium-editor](https://github.com/daviferreira/medium-editor)).
 

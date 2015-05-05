@@ -15,6 +15,7 @@ export class Editor {
     this.editor = null;
     this.empty = true;
     this.value = '';
+    this.inputChangeTimer = null;
     this.options = {};
     let baseOptions = {
       placeholder: 'Type Something...',
@@ -184,7 +185,7 @@ export class Editor {
     }
 
     this.editor.addEventListener('focus', (e) => this.onFocus(e));
-    this.editor.addEventListener('change', (e) => this.onChange(e));
+    this.editor.addEventListener('input', (e) => this.onChange(e));
     this.editor.addEventListener('blur', (e) => this.onBlur(e));
     this.editor.addEventListener('mouseup', (e) => this.onMouseUp(e));
     this.editor.addEventListener('mousedown', (e) => this.onMouseDown(e));
@@ -199,24 +200,24 @@ export class Editor {
     this.editor.innerHTML =this.options.placeholder;
     this.value = '';
     this.empty = true;
-    this.dispatchEvent('editor.change')
+    this.dispatchEvent('editor.update')
   }
 
   dispatchEvent(eventName, ...args) {
-    let change = new Event(eventName);
-    this.editor.dispatchEvent(change);
+    let e = new Event(eventName);
+    this.editor.dispatchEvent(e);
   }
 
   setValue(val) {
     this.value = val;
     this.editor.innerHTML =this.value;
     this.empty = false;
-    this.dispatchEvent('editor.change')
+    this.dispatchEvent('editor.update')
   }
 
   updateValue() {
     this.value = this.editor.innerHTML;
-    this.dispatchEvent('editor.change')
+    this.dispatchEvent('editor.update')
   }
 
   exec(cmd, ...options) {
@@ -244,18 +245,19 @@ export class Editor {
   }
 
   onFocus(e) {
-    console.debug('focus', e);
     if (this.empty) {
       this.editor.innerHTML = '<p><br/></p>';
     }
   }
 
   onChange(e) {
-    console.debug('change', e);
+    if (this.inputChangeTimer) {
+      clearTimeout(this.inputChangeTimer);
+    }
+    this.inputChangeTimer = setTimeout(() => this.updateValue(), 300);
   }
 
   onBlur(e) {
-    console.debug('blur', e);
     let value = this.editor.innerHTML;
 
     if (this.stripTag(value) === '') {
@@ -263,7 +265,6 @@ export class Editor {
     } else {
       this.setValue(value);
     }
-    console.log(this.value);
   }
 
   setMousePosition(x, y, height = null) {
@@ -317,7 +318,6 @@ export class Editor {
 
   onMouseDown(e) {
     this.getSelection();
-    console.log(e);
     this.setMousePosition(e.pageX, e.pageY, e.target.clientHeight);
   }
 

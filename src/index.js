@@ -13,7 +13,7 @@ class DebugCtrl {
     this.element = document.getElementById(target);
       this.createTextArea();
 
-    this.editor.editor.addEventListener('editor.change', (e) => {
+    this.editor.editor.addEventListener('editor.update', (e) => {
       this.textArea.innerHTML = this.editor.value;
     });
 

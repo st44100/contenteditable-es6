@@ -20,7 +20,7 @@ export class Editor {
       placeholder: 'Type Something...',
       buttons:[
         {
-          key: 'h2',
+         key: 'h2',
           html: '<button class="btn btn-default">H2</button>',
           action: (e) => this.onButtonAction(e, 'formatBlock', false, '<h2>')
         },
@@ -118,6 +118,7 @@ export class Editor {
     if (this.floatingTbar) { return; }
 
     this.floatingTbar = document.createElement('div');
+    this.floatingTbar.className = 'floating-tbar'
     this.floatingTbar.setAttribute('style',
       `
         position: absolute;
@@ -159,7 +160,7 @@ export class Editor {
       throw new Error("Missing ID for editor");
     }
     this.createContentEditable();
-    this.createToolbar();
+    //this.createToolbar();
     this.createFloatingTbar();
     this.reset();
     this.initEvent();
@@ -285,15 +286,23 @@ export class Editor {
           y = rect.top;
         }
       }
+    } else {
+      this.floatingTbar.style.opacity = 0;
+      return;
     }
     let targetX = x + w / 2 - this.floatingTbar.clientWidth / 2;
+    let targetY = y - this.floatingTbar.clientHeight - 20;
     let editorRect = this.editor.getBoundingClientRect();
     if (targetX < editorRect.left) {
       targetX = editorRect.left;
     }
-    this.floatingTbar.style.left = `${targetX}px`;
-    this.floatingTbar.style.top = `${y - this.floatingTbar.clientHeight - 20}px`;
-    this.floatingTbar.style.opacity = 1;
+    if (targetY < 1) {
+      setTimeout( () => this.floatingTbar.style.opacity = 0, 100);
+    } else {
+      this.floatingTbar.style.left = `${targetX}px`;
+      this.floatingTbar.style.top = `${targetY}px`;
+      setTimeout( () => this.floatingTbar.style.opacity = 1, 100);
+    }
   }
 
   onMouseUp(e) {

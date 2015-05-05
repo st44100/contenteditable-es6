@@ -1,0 +1,30 @@
+
+@import 'nib'
+
+/**
+ * Common animation prop
+ */
+
+common-duration = .2s
+common-easing = ease
+common-tf = ease-in
+common-delay = 0s
+
+// MIXIN
+common-transition(prop=all,duration = common-duration, tf = common-tf , delay = common-delay)
+  transition prop duration tf delay
+
+body
+  padding-top 50px
+  padding-bottom 20px
+
+.navbar-brand img
+	height 24px
+	width 24px
+
+.tbar__btn
+  display inline-block
+
+.floating-tbar
+  position absolute
+  common-transition(all, .1s)

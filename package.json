@@ -16,8 +16,10 @@
     "gulp-changed": "^1.2.1",
     "gulp-jshint": "^1.9.4",
     "gulp-plumber": "^1.0.0",
+    "gulp-stylus": "^2.0.1",
     "jshint-stylish": "^1.0.1",
     "jspm": "^0.14.0",
+    "nib": "^1.1.0",
     "object.assign": "^1.1.1",
     "run-sequence": "^1.0.2",
     "vinyl-paths": "^1.0.0"

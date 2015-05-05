@@ -4,6 +4,9 @@ var del = require('del');
 
 var babel = require('gulp-babel');
 
+var stylus = require('gulp-stylus');
+var nib = require('nib')
+
 var vinylPaths = require('vinyl-paths');
 
 var changed = require('gulp-changed');
@@ -19,7 +22,7 @@ var browserSync = require('browser-sync');
 var path = {
 	source: 'src/**/*.js',
 	html: 'src/**/*.html',
-	style: 'styles/**/*.css',
+	style: 'src/styles/**/*.styl',
 	output: 'dist'
 };
 
@@ -69,6 +72,19 @@ gulp.task('build-system', function() {
 		.pipe(gulp.dest(path.output))
 });
 
+gulp.task('build-style', function() {
+	return gulp.src(path.style)
+		.pipe(changed(path.output), {
+			extension: '.css'
+    })
+    .pipe(stylus({
+      use:[
+        nib()
+      ]
+    }))
+		.pipe(gulp.dest(path.output));
+});
+
 gulp.task('build-html', function() {
 	return gulp.src(path.html)
 		.pipe(changed(path.output), {
@@ -85,7 +101,7 @@ gulp.task('lint', function() {
 
 gulp.task('build', function(callback) {
 	return runSequence(
-		'clean', ['build-system', 'build-html'],
+		'clean', ['build-system', 'build-html', 'build-style'],
 		callback
 	);
 });
@@ -112,5 +128,5 @@ function reportChange(event) {
 gulp.task('watch', ['serve'], function() {
 	gulp.watch(path.source, ['build-system', browserSync.reload]).on('change', reportChange);
 	gulp.watch(path.html, ['build-html', browserSync.reload]).on('change', reportChange);
-	gulp.watch(path.style, browserSync.reload).on('change', reportChange);
+	gulp.watch(path.style, ['build-style', browserSync.reload]).on('change', reportChange);
 });
